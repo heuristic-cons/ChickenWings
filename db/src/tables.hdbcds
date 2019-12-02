@@ -22,7 +22,7 @@
         TIMESTAMP : UTCTimestamp;
     };*/
 using CWTypes.BaseT;
-using CWTypes.myChangeT;    
+using CWTypes.myChangeT;
 /*@@layout{"layoutInfo":{"x":946,"y":-450}}*/
 entity Airport{
 key CODE:  String(3);                                                 //Airport IATA Code
@@ -147,7 +147,9 @@ technical configuration{
 entity Connection
 {
   key FLIGHT: type of BaseT.FlightT;                                //Flight Number
-      FROMAP: type of BaseT.CodeT;                                  //Origin Airport
+      //FROMAP: type of BaseT.CodeT;                                  //Origin Airport
+//Managed Association – Origin Airport
+      FROMAP: association[*, 1] to Airport {CODE};      
         TOAP: type of BaseT.CodeT;                                  //Destination Airport
         DEPT: LocalTime;                                            //Scheduled Departure Time
         ARRT: LocalTime;                                            //Scheduled Arrival Time
@@ -162,8 +164,8 @@ entity Connection
        MILES: Integer;                                              //Distance in Miles
       CHANGE: myChangeT;                                            //Last Change Timestamp and User
 // Associations
-_FromAirport : association[*,0..1] to Airport
-on _FromAirport.CODE = FROMAP;
+/*_FromAirport : association[*,0..1] to Airport
+on _FromAirport.CODE = FROMAP;*/
 _ToAirport : association[*,0..1] to Airport
 on _ToAirport.CODE   = TOAP;
 }
@@ -246,3 +248,31 @@ technical configuration{
    unload priority 5;                                              //Standard settings
    group type app group subtype ChickenWings group name transaction;
 };
+
+//CDSView:CreatesdatabaseView
+view OpenSeats
+as SELECT FROM Booking
+{
+	FLIGHT,
+	FDATE,
+	COUNT(SEAT) as TOTAL_SEATS
+} WHERE STATUS = 'AVAILABLE'
+	GROUP BY FLIGHT,
+	FDATE
+	HAVING COUNT(SEAT)>2
+	ORDER BY FLIGHT ASC,FDATE DESC
+;
+//CDSViewwithParameters:Createsdatabasetablefunction
+view OpenSeats2 with parameters P_DATE : LocalDate
+as SELECT FROM Booking
+{
+	FLIGHT,
+	FDATE,
+	COUNT(SEAT) as TOTAL_SEATS
+	} WHERE STATUS = 'AVAILABLE'
+	AND FDATE = :P_DATE
+	GROUP BY FLIGHT,
+	FDATE
+	HAVING COUNT(SEAT)>2
+	ORDER BY FLIGHTASC,FDATEDESC
+;
