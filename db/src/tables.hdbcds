@@ -1,38 +1,40 @@
-/*
-* DataTypeDefinition
-*/
-type NameT      :String(20);
-type PhoneT     :String(15);
-type EmailT     :String(30);
-type CityT      :String(20);
-type CountryT   :String(25);
-type CodeT      :String(3);
-type FlightT    :String(6);
-type PriceT     :Decimal(12,2);
-type ModelT     :String(10);
-type SeatT      :String(4);
-/*
-/*
-* Structuredefinition
-* technicalstructuretobeusedinallentities
-* tostorelastchangedtimestampandlastchangedbyuser
-*/
-type ChangeT{
-USER: String(20);//ChangedbyUser
-TIMESTAMP: UTCTimestamp;
-};
+    /*
+    * DataTypeDefinition
+    */
+/*  type NameT : String(20);
+    type PhoneT : String(15);
+    type EmailT : String(30);
+    type CityT : String(20);
+    type CountryT : String(25);
+    type CodeT : String(3);
+    type FlightT : String(6);
+    type PriceT : Decimal(12, 2);
+    type ModelT : String(10);
+    type SeatT : String(4);*/
+    /*
+    /*
+    * Structuredefinition
+    * technicalstructuretobeusedinallentities
+    * tostorelastchangedtimestampandlastchangedbyuser
+    */
+/*    type ChangeT {
+        USER      : String(20);   //ChangedbyUser
+        TIMESTAMP : UTCTimestamp;
+    };*/
+using CWTypes.BaseT;
+using CWTypes.myChangeT;    
 /*@@layout{"layoutInfo":{"x":946,"y":-450}}*/
 entity Airport{
 key CODE:  String(3);                                                 //Airport IATA Code
     NAME:  String(50);                                                //Airport Name
-    CITY:  CityT;                                                     //Airport City
- COUNTRY:  CountryT default 'USA';                                    //Airport Country
+    CITY:  type of BaseT.CityT;                                       //Airport City
+ COUNTRY:  type of BaseT.CountryT default 'USA';                      //Airport Country
 TIMEZONE:  String(3);                                                 //Airport Time Zone
 LATITUDE:  Decimal(12,6) not null;                                    //Coordinates: Latitude
 LONGITUDE: Decimal(12,6) not null;                                    //Coordinates: Longitude
 LOCATION: /*SpatialData*/ hana.ST_POINT(4326)
 = new ST_POINT('POINT ('||LONGITUDE || ' ' || LATITUDE || ')' ,4326); //Geo Coordinates: Point4326
-  CHANGE:  ChangeT;                                                   //Technical Columns
+  CHANGE:  myChangeT;                                                 //Technical Columns
 }
 technical configuration{
 column store;                                                         //Column Table
@@ -56,7 +58,7 @@ MANUFACTURER: String(20);                                             //Manufact
      ECOSEAT: Integer;                                                //No of Economy Class Seats
      BUSSEAT: Integer;                                                //No of Business Class Seats
      FIRSEAT: Integer;                                                //No of First Class Seats
-      CHANGE: ChangeT;                                                //Last Change Timestamp and User
+      CHANGE: myChangeT;                                              //Last Change Timestamp and User
 }
 technical configuration {
     column store;                                                     //ColumnTable
@@ -71,13 +73,13 @@ technical configuration {
 entity Crew
 {
  key CREWID: Integer;                                                 //CustomerID
-      FNAME: NameT;                                                   //FirstName
-      LNAME: NameT;                                                   //LastName
-     MOBILE: PhoneT;                                                  //Mobile/Cell Number
-EMAIL:EmailT;//Email
-COUNTRY:CountryT;//CountryofResidence
-ROLE:String(20);//Job/RoleofCrew
-CHANGE:ChangeT;//LastChangeTimestampandUser
+      FNAME: type of BaseT.NameT;                                     //FirstName
+      LNAME: type of BaseT.NameT;                                     //LastName
+     MOBILE: type of BaseT.PhoneT;                                    //Mobile/Cell Number
+      EMAIL: type of BaseT.EmailT;                                    //Email
+    COUNTRY: type of BaseT.CountryT;                                  //CountryofResidence
+       ROLE: String(20);                                              //Job/RoleofCrew
+     CHANGE: myChangeT;                                               //Last Change Timestamp and User
 }
 technical configuration{
    column store;                                                     //ColumnTable
@@ -92,13 +94,13 @@ technical configuration{
 entity Customer
 {
  key CUSTID: Integer;                                               //Customer ID
-      FNAME: NameT;                                                 //FirstName
-      LNAME: NameT;                                                 //LastName
-     MOBILE: PhoneT;                                                //Mobile/Cell Number
-      EMAIL: EmailT;                                                //Email
-    COUNTRY: CountryT;                                              //Country of Residence
+      FNAME: type of BaseT.NameT;                                   //FirstName
+      LNAME: type of BaseT.NameT;                                   //LastName
+     MOBILE: type of BaseT.PhoneT;                                  //Mobile/Cell Number
+      EMAIL: type of BaseT.EmailT;                                  //Email
+    COUNTRY: type of BaseT.CountryT;                                //Country of Residence
     FLYERID: String(20);                                            //Frequent Flyer ID
-     CHANGE: ChangeT;                                               //Last Change Timestamp and User
+     CHANGE: myChangeT;                                             //Last Change Timestamp and User
 }
 technical configuration{
   column store;                                                     //Column Table
@@ -111,11 +113,11 @@ group type app group subtype ChickenWings group name master;
 
 entity Seat
 {
-  key MODEL: ModelT;                                                //Plane Model
-  key  SEAT: SeatT;                                                 //Seat Number
+  key MODEL: type of BaseT.ModelT;                                  //Plane Model
+  key  SEAT: type of BaseT.SeatT;                                   //Seat Number
       CLASS: String(10);                                            //Class of Seat: Economy,Business
       STYPE: String(15);                                            //Type of Seating: Window/Isle
-     CHANGE: ChangeT;                                               //Last Change Timestamp and User
+     CHANGE: myChangeT;                                             //Last Change Timestamp and User
 }
 technical configuration{
    column store;//ColumnTable
@@ -130,7 +132,7 @@ entity PriceCalendar
   key CDATE: LocalDate;                                             //Date
        RATE: String(10);                                            //Standard or Peak Rate for Pricing
      SEASON: String(20);                                            //Season used for Pricing
-     CHANGE: ChangeT;                                               //Last Change Timestamp and User
+     CHANGE: myChangeT;                                             //Last Change Timestamp and User
 }
 technical configuration{
    column store;                                                    //Column Table
@@ -144,21 +146,21 @@ technical configuration{
 
 entity Connection
 {
-  key FLIGHT: FlightT;                                              //Flight Number
-      FROMAP: CodeT;                                                //Origin Airport
-        TOAP: CodeT;                                                //Destination Airport
+  key FLIGHT: type of BaseT.FlightT;                                //Flight Number
+      FROMAP: type of BaseT.CodeT;                                  //Origin Airport
+        TOAP: type of BaseT.CodeT;                                  //Destination Airport
         DEPT: LocalTime;                                            //Scheduled Departure Time
         ARRT: LocalTime;                                            //Scheduled Arrival Time
      SSTARTD: LocalDate;                                            //Service Start Date
        SENDD: LocalDate;                                            //Service End Date
-     ESPRICE: PriceT;                                               //Economy Class Standard Price
-     EPPRICE: PriceT;                                               //Economy Class Peak Price
-     BSPRICE: PriceT;                                               //Business Class Standard Price
-     BPPRICE: PriceT;                                               //Business Class Peak Price
-     FSPRICE: PriceT;                                               //First Class Standard Price
-     FPPRICE: PriceT;                                               //First Class Peak Price
+     ESPRICE: type of BaseT.PriceT;                                 //Economy Class Standard Price
+     EPPRICE: type of BaseT.PriceT;                                 //Economy Class Peak Price
+     BSPRICE: type of BaseT.PriceT;                                 //Business Class Standard Price
+     BPPRICE: type of BaseT.PriceT;                                 //Business Class Peak Price
+     FSPRICE: type of BaseT.PriceT;                                 //First Class Standard Price
+     FPPRICE: type of BaseT.PriceT;                                 //First Class Peak Price
        MILES: Integer;                                              //Distance in Miles
-      CHANGE: ChangeT;                                              //Last Change Timestamp and User
+      CHANGE: myChangeT;                                            //Last Change Timestamp and User
 // Associations
 _FromAirport : association[*,0..1] to Airport
 on _FromAirport.CODE = FROMAP;
@@ -177,7 +179,7 @@ technical configuration{
 
 entity Flight
 {
-  key FLIGHT: FlightT;                                              //Flight Number
+  key FLIGHT: type of BaseT.FlightT;                                //Flight Number
   key FDATE : LocalDate;                                            //Flight Date
       PLANE : Integer;                                              //Plane RegNo
       PILOT1: Integer;                                              //Pilot
@@ -188,7 +190,7 @@ entity Flight
         DEPT: LocalTime;                                            //Actual Departure Time
         ARRT: LocalTime;                                            //Actual Arrival Time
       STATUS: String(10);                                           //Flight Status
-      CHANGE: ChangeT;                                              //Last Change Timestamp and User
+      CHANGE: myChangeT;                                            //Last Change Timestamp and User
 // Associations
    _Connection: association[*,0..1] to Connection
 on _Connection.FLIGHT  = FLIGHT;
@@ -217,22 +219,22 @@ technical configuration{
 
 entity Booking
 {
-   key FLIGHT: FlightT;                                            //Flight Number
+   key FLIGHT: type of BaseT.FlightT;                              //Flight Number
    key  FDATE: LocalDate;                                          //Flight Date
-   key  MODEL: ModelT;                                             //Plane Model
-   key   SEAT: ModelT;                                             //Seat Number
+   key  MODEL: type of BaseT.ModelT;                               //Plane Model
+   key   SEAT: type of BaseT.ModelT;                               //Seat Number
        CUSTID: Integer;                                            //Customer ID
-     STDPRICE: PriceT;                                             //Base Price
-    BOOKPRICE: PriceT;                                             //Book Price
-         FEES: PriceT;                                             //Surcharges/Fees
-     DISCOUNT: PriceT;                                             //Discount
-          TAX: PriceT;                                             //Tax
-        TOTAL: PriceT;                                             //Total Amount Charged
+     STDPRICE: type of BaseT.PriceT;                               //Base Price
+    BOOKPRICE: type of BaseT.PriceT;                               //Book Price
+         FEES: type of BaseT.PriceT;                               //Surcharges/Fees
+     DISCOUNT: type of BaseT.PriceT;                               //Discount
+          TAX: type of BaseT.PriceT;                               //Tax
+        TOTAL: type of BaseT.PriceT;                               //Total Amount Charged
       PAYMENT: String(15);                                         //Mode of Payment CREDIT,CASH,POINTS
        STATUS: String(10);                                         //Booking Status Hold/Confirmed/Available
     PASSENGER: String(20);                                         //Name of the Passenger
       CHECKIN: String(1);                                          //Check-in Status
-       CHANGE: ChangeT;                                            //Last Change Timestamp and User
+       CHANGE: myChangeT;                                          //Last Change Timestamp and User
 // Associations
  _Flight:association    [*,0..1] to Flight{FLIGHT,FDATE};
  _Seat:association      [*,0..1] to Seat{MODEL,SEAT};

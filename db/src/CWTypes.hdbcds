@@ -1,0 +1,27 @@
+context CWTypes {
+    /*
+    * DataTypeDefinition
+    */
+ type BaseT{    
+    NameT : String(20);
+    PhoneT : String(15);
+    EmailT : String(30);
+    CityT : String(20);
+    CountryT : String(25);
+    CodeT : String(3);
+    FlightT : String(6);
+    PriceT : Decimal(12, 2);
+    ModelT : String(10);
+    SeatT : String(4);
+ };
+    /*
+    /*
+    * Structuredefinition
+    * technicalstructuretobeusedinallentities
+    * tostorelastchangedtimestampandlastchangedbyuser
+    */
+    type myChangeT {
+        USER      : String(20);   //ChangedbyUser
+        TIMESTAMP : UTCTimestamp;
+    };
+};
